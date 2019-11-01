@@ -8,7 +8,6 @@ from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 import random
 
-
 #greeting file
 gr = pd.read_csv('E:\\MedBot\\Greeting Dataset.csv', engine='python')
 gr = np.array(gr)
@@ -38,6 +37,12 @@ bd = by[:,0]
 nm = pd.read_csv('E:\\MedBot\\Name Dataset.csv', engine='python')
 nm = np.array(nm)
 nd = nm[:,0]
+
+#symptoms file
+sr = pd.read_csv('E:\\MedBot\\final_dataset.csv', engine='python')
+sr = np.array(sr)
+dis = sr[:,1]
+symp = sr[:,2]
 
 def stopWords(text):
     #text is a sentence
@@ -190,12 +195,40 @@ def extDisease():
         return 'Nothing Sevre'
 
 def getSymptoms():
+    print('Please tell me about your symproms')
     inp = input()
-    filtered = stopWords(text)
+    filtered = stopWords(inp)
     stemmed = stemming(filtered)
     
-    
+    #compare input with csv file with filtered sentence
+    i1=i2=i3=0
+    max1=0
+    max2=1
+    max3=2
+    for i in range(symp.size):
+        sequence = difflib.SequenceMatcher(isjunk=None, a=filtered, b=symp[i])
+        diff = sequence.ratio()*100
+        if(diff>max1):
+            max3=max2
+            max2=max1
+            max1=diff
+            i1=i
+        elif(diff>max2):
+            max3=max2
+            max2=diff
+            i2=i
+        elif(diff>max3):
+            max3=diff
+            i3=i
 
+    print('Diagnosed Diseases are:')
+    if(i1!=i2!=i3):
+        print(dis[i1])
+        print(dis[i2])
+        print(dis[i3])
+    else:
+        print(dis[i1])
+   
 #Starting the conversation 
 greet()
 print('I\'m MedBot, your personal health assistant.')
